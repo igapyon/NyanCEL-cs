@@ -27,12 +27,19 @@ NyanCEL は Excel ブック (.xlsx) のシート内容を SQL で検索できる
    - SQLite の SQL 文法が利用可能
 4. SELECT 文の検索結果を返却します
    - 行データを繰り返して検索結果を返却
-   - デフォルトで JSON データとして検索結果を返却
-   - `fmt=xml` パラメータ追加でデータ返却形式を XML に変更可能
-   - `fmt=xlsx` パラメータ追加でデータ返却形式を xlsx に変更可能
-   - `fmt=json&target=data.1` パラメータ指定で返却データを絞ることが可能
-   - `fmt=json&jsonpath=` で検索結果に対して jsonpath を適用可能
-   - `fmt=xml&xpath=` で検索結果に対して xpath を適用可能
+   - 返却結果として、json, xml, xlsx 形式サポート
+
+## Usage
+
+```cs
+  using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+  {
+    var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+    List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(
+      connection, memoryStream);
+    string resultString = await NyanSql2Json.Sql2Json(connection, "SELECT * FROM sqlite_master");
+  }
+```
 
 ## 内部的に利用している OSS
 

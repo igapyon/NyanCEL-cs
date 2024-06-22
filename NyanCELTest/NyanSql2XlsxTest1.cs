@@ -5,7 +5,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NyanCEL;
 
@@ -17,17 +16,14 @@ namespace NyanCELTest
         [TestMethod]
         public async Task Sql2XlsxTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+                var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+                List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            byte[] resultByteArray = await NyanSql2Xlsx.Sql2Xlsx(connection, "SELECT * FROM sqlite_master");
-            // TODO Check binary result data.
+                byte[] resultByteArray = await NyanSql2Xlsx.Sql2Xlsx(connection, "SELECT * FROM sqlite_master");
+                // TODO Check binary result data.
+            }
         }
     }
 }

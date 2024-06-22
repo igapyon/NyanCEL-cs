@@ -5,7 +5,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NyanCEL;
 
@@ -17,17 +16,13 @@ namespace NyanCELTest
         [TestMethod]
         public async Task Sql2XmlTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+              var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+              List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            string resultString = await NyanSql2Xml.Sql2Xml(connection, "SELECT * FROM sqlite_master");
-            Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-16""?>
+              string resultString = await NyanSql2Xml.Sql2Xml(connection, "SELECT * FROM sqlite_master");
+              Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-16""?>
 <ArrayOfRow xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
   <Row>
     <Column Name=""type"">table</Column>
@@ -58,24 +53,20 @@ namespace NyanCELTest
     <Column Name=""sql"">CREATE TABLE ""CellFormat"" (""Field1"" TEXT, ""Field2"" TEXT, ""Field3"" REAL, ""Field4"" TEXT, ""Field5"" REAL, ""Field6"" TEXT, ""Field7"" REAL, NyanRowId INTEGER PRIMARY KEY)</Column>
   </Row>
 </ArrayOfRow>", resultString);
-            Console.WriteLine(resultString);
+          }
         }
 
         [TestMethod]
         public async Task Sql2XmlWithXPathTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+              var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+              List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            string resultString = await NyanSql2Xml.Sql2XmlWithXPath(connection, "SELECT * FROM sqlite_master", "/ArrayOfRow/Row[1]");
-            Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-16""?><Row><Column Name=""type"">table</Column><Column Name=""name"">11SAITAM</Column><Column Name=""tbl_name"">11SAITAM</Column><Column Name=""rootpage"">2</Column><Column Name=""sql"">CREATE TABLE ""11SAITAM"" (""JISX0401"" TEXT, ""OLDZIPCODE"" TEXT, ""ZIPCODE"" TEXT, ""TODOFUKEN_ZENKANA"" TEXT, ""SIKUTYOUSON_ZENKANA"" TEXT, ""TYOUIKI_ZENKANA"" TEXT, ""TODOFUKEN_KANJI"" TEXT, ""SIKUTYOSON_KANJI"" TEXT, ""TYOUIKI_KANJI"" TEXT, ""DUPZIP"" REAL, ""KOAZAKIBAN"" REAL, ""HAS_TYOUME"" REAL, ""DUP_TYOUIKI"" REAL, ""UPDATED"" REAL, ""UPDATE_REASON"" REAL, NyanRowId INTEGER PRIMARY KEY)</Column></Row>", resultString);
-            Console.WriteLine(resultString);
+              string resultString = await NyanSql2Xml.Sql2XmlWithXPath(connection, "SELECT * FROM sqlite_master", "/ArrayOfRow/Row[1]");
+              Assert.AreEqual(@"<?xml version=""1.0"" encoding=""utf-16""?><Row><Column Name=""type"">table</Column><Column Name=""name"">11SAITAM</Column><Column Name=""tbl_name"">11SAITAM</Column><Column Name=""rootpage"">2</Column><Column Name=""sql"">CREATE TABLE ""11SAITAM"" (""JISX0401"" TEXT, ""OLDZIPCODE"" TEXT, ""ZIPCODE"" TEXT, ""TODOFUKEN_ZENKANA"" TEXT, ""SIKUTYOUSON_ZENKANA"" TEXT, ""TYOUIKI_ZENKANA"" TEXT, ""TODOFUKEN_KANJI"" TEXT, ""SIKUTYOSON_KANJI"" TEXT, ""TYOUIKI_KANJI"" TEXT, ""DUPZIP"" REAL, ""KOAZAKIBAN"" REAL, ""HAS_TYOUME"" REAL, ""DUP_TYOUIKI"" REAL, ""UPDATED"" REAL, ""UPDATE_REASON"" REAL, NyanRowId INTEGER PRIMARY KEY)</Column></Row>", resultString);
+            }
         }
     }
 }

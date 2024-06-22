@@ -28,11 +28,19 @@ NyanCEL is a library that allows you to query the contents of Excel workbooks (.
 4. Return the results of the SELECT statement
    - Return the search results row by row
    - Default returns the search results as JSON data
-   - Change the return format to XML by adding the `fmt=xml` parameter
-   - Change the return format to xlsx by adding the `fmt=xlsx` parameter
-   - Narrow down return data by specifying `fmt=json&target=data.1`
-   - Apply jsonpath to search results with `fmt=json&jsonpath=`
-   - Apply xpath to search results with `fmt=xml&xpath=`
+   - json, xml, xlsx are supported for search results
+
+## Usage
+
+```cs
+  using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+  {
+    var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+    List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(
+      connection, memoryStream);
+    string resultString = await NyanSql2Json.Sql2Json(connection, "SELECT * FROM sqlite_master");
+  }
+```
 
 ## Internally Used OSS
 

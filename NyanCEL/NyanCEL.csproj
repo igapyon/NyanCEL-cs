@@ -10,7 +10,7 @@
     <Copyright>Copyright (c) 2024 Toshiki Iga</Copyright>
     <PackageId>Igapyon.NyanCEL</PackageId>
     <Version>0.5.0</Version>
-    <ProjectUrl>https://github.com/igapyon/NyanCEL-cs</ProjectUrl>
+    <PackageProjectUrl>https://github.com/igapyon/NyanCEL-cs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/igapyon/NyanCEL-cs</RepositoryUrl>
     <PackageTags>xlsx;sqlite;json;sql</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>

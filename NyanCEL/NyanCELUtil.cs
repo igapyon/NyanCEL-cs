@@ -16,6 +16,7 @@ namespace NyanCEL
     public class NyanCELUtil
     {
         private static SqliteConnection _connection = null;
+        private static readonly object _lock = new object();
 
         public static async Task<SqliteConnection> GetXlsxDatabaseInstance() {
             if (_connection != null) 
@@ -23,7 +24,14 @@ namespace NyanCEL
                 return _connection;
             }
 
-            _connection = await CreateXlsxDatabase();
+            lock(_lock)
+            {
+                if (_connection == null) 
+                {
+                    _connection = await CreateXlsxDatabase();
+                }
+            }
+
             return _connection;
         }
 

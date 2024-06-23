@@ -3,12 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Title>NyanCEL</Title>
-    <Description>NyanCEL is a library to run SQL on Xlsx.</Description>
+    <Description>NyanCEL is a library that allows you to query the contents of Excel workbooks (.xlsx) using SQL.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Toshiki Iga</Authors>
+    <Owners>Toshiki Iga</Owners>
+    <Copyright>Copyright (c) 2024 Toshiki Iga</Copyright>
     <PackageId>Igapyon.NyanCEL</PackageId>
     <Version>0.5.0</Version>
+    <PackageProjectUrl>https://github.com/igapyon/NyanCEL-cs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/igapyon/NyanCEL-cs</RepositoryUrl>
+    <PackageTags>xlsx;sqlite;json;sql</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>

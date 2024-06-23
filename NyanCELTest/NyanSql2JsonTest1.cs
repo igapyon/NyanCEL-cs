@@ -5,7 +5,6 @@
 
 using System;
 using System.IO;
-using Microsoft.Data.Sqlite;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NyanCEL;
 
@@ -17,17 +16,13 @@ namespace NyanCELTest
         [TestMethod]
         public async Task Sql2JsonTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+              var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+              List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            string resultString = await NyanSql2Json.Sql2Json(connection, "SELECT * FROM sqlite_master");
-            Assert.AreEqual(@"[
+              string resultString = await NyanSql2Json.Sql2Json(connection, "SELECT * FROM sqlite_master");
+              Assert.AreEqual(@"[
   {
     ""type"": ""table"",
     ""name"": ""11SAITAM"",
@@ -57,41 +52,33 @@ namespace NyanCELTest
     ""sql"": ""CREATE TABLE \""CellFormat\"" (\""Field1\"" TEXT, \""Field2\"" TEXT, \""Field3\"" REAL, \""Field4\"" TEXT, \""Field5\"" REAL, \""Field6\"" TEXT, \""Field7\"" REAL, NyanRowId INTEGER PRIMARY KEY)""
   }
 ]", resultString);
-            Console.WriteLine(resultString);
+          }
         }
 
         [TestMethod]
         public async Task Sql2JsonWithJSONPathTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+              var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+              List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            string resultString = await NyanSql2Json.Sql2JsonWithJSONPath(connection, "SELECT * FROM sqlite_master", "[1].name");
-            Assert.AreEqual(@"TypeCheck", resultString);
-            Console.WriteLine(resultString);
+              string resultString = await NyanSql2Json.Sql2JsonWithJSONPath(connection, "SELECT * FROM sqlite_master", "[1].name");
+              Assert.AreEqual(@"TypeCheck", resultString);
+            }
         }
 
         [TestMethod]
         public async Task Sql2JsonWithTargetTest1()
         {
-            SqliteConnection connection = new SqliteConnection("Data Source=:memory:");
-            await connection.OpenAsync();
+            using (var connection = await NyanCELUtil.CreateXlsxDatabase())
+            {
+              var memoryStream = await NyanCELUtil.ReadBinaryFile2MemoryStream("./TestData/Book1.xlsx");
+              List<NyanTableInfo> tableInfoList = await NyanXlsx2Sqlite.LoadExcelFile(connection, memoryStream);
 
-            byte[] data = NyanCELUtil.ReadBinaryFile("./TestData/Book1.xlsx");
-            var memoryStream = await NyanCELUtil.ByteArray2MemoryStream(data);
-
-            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
-            await NyanXlsx2Sqlite.LoadExcelFileAsync(connection, memoryStream, tableInfoList);
-
-            string resultString = await NyanSql2Json.Sql2JsonWithTarget(connection, "SELECT * FROM sqlite_master", "data.1.name");
-            Assert.AreEqual(@"TypeCheck", resultString);
-            Console.WriteLine(resultString);
+              string resultString = await NyanSql2Json.Sql2JsonWithTarget(connection, "SELECT * FROM sqlite_master", "data.1.name");
+              Assert.AreEqual(@"TypeCheck", resultString);
+            }
         }
     }
 }

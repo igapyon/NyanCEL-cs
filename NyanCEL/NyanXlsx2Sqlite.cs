@@ -15,8 +15,9 @@ namespace NyanCEL
 {
     public class NyanXlsx2Sqlite
     {
-        public async static Task LoadExcelFileAsync(SqliteConnection _connection, MemoryStream fileData, List<NyanTableInfo> tableInfoList)
+        public async static Task<List<NyanTableInfo>> LoadExcelFile(SqliteConnection _connection, MemoryStream fileData)
         {
+            List<NyanTableInfo> tableInfoList = new List<NyanTableInfo>();
             using (var workbook = new XLWorkbook(fileData))
             {
                 foreach (var worksheet in workbook.Worksheets)
@@ -47,6 +48,7 @@ namespace NyanCEL
                     }
                 }
             }
+            return tableInfoList;
         }
 
         private static void BuildColumnInfo(IXLWorksheet worksheet, NyanTableInfo tableInfo)
